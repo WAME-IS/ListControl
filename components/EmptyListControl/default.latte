@@ -1,0 +1,15 @@
+{if $listComponents}
+    <h2 n:if="$control->getComponentParameter('showTitle')">{$control->getTitle()}</h2>
+
+    <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
+
+    {$listContainer->startTag()|noescape}
+    {foreach $listComponents as $listComponentInfo}
+        {$listComponentInfo->container->startTag()|noescape}
+        {control $listComponentInfo->component}
+        {$listComponentInfo->container->endTag()|noescape}
+    {/foreach}
+    {$listContainer->endTag()|noescape}
+{else}
+    {control noItems}
+{/if}

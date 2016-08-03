@@ -20,12 +20,14 @@ class TemplateListRenderer extends SimpleListRenderer
      */
     function render($listControl)
     {   
-        $listControl->template->hasComponents = $listControl->hasComponents();
+        $components = $listControl->getListComponents();
+        
+        $listControl->template->hasComponents = boolval($components);
         $listControl->template->listContainer = $this->getContainer($listControl, $this->defaults['list']);
 
         $listComponents = [];
         
-        foreach ($listControl->getListComponents() as $component) {
+        foreach ($components as $component) {
 
             $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
 

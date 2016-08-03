@@ -2,7 +2,7 @@
 
 namespace Wame\ListControl\Components;
 
-class IEntityControlFactory
+interface IEntityControlFactory
 {
 
     /**
