@@ -2,9 +2,11 @@
 
 namespace Wame\ListControl\Renderer;
 
+use Nette\InvalidArgumentException;
 use Nette\Utils\Html;
 use Wame\ComponentModule\Paremeters\Readers\ParameterReaders;
 use Wame\Core\Components\BaseControl;
+use Wame\ListControl\Components\ListControl;
 
 class SimpleListRenderer implements IListRenderer
 {
@@ -21,7 +23,7 @@ class SimpleListRenderer implements IListRenderer
     /**
      * Provides complete list rendering.
      * 
-     * @param \Wame\ListControl\ListControl $listControl
+     * @param ListControl $listControl
      * @return string
      */
     function render($listControl)
@@ -33,6 +35,13 @@ class SimpleListRenderer implements IListRenderer
         }
 
         $components = $listControl->getListComponents();
+        
+        if(!is_array($components)) {
+            $e = new InvalidArgumentException("List has to return array of components.");
+            $e->components = $components;
+            throw $e;
+        }
+        
         if ($components) {
             $this->renderComponents($components);
         } else {
@@ -76,7 +85,7 @@ class SimpleListRenderer implements IListRenderer
      * @param array $defaultParams
      * @return Html
      */
-    private function getContainer($control, $defaultParams)
+    protected function getContainer($control, $defaultParams)
     {
         $containerParams = $control->getComponentParameter("container", ParameterReaders::$HTML);
         $containerParams = array_replace_recursive($defaultParams, $containerParams);

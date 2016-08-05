@@ -41,6 +41,8 @@ class ProvidedListControl extends ListControl
             $itemsParameters = new ArrayParameterSource($itemsParameters);
         }
 
+        $components = [];
+        
         foreach ($items as $id => $item) {
             $component = $this->componentFactory->create($item);
 
@@ -48,8 +50,11 @@ class ProvidedListControl extends ListControl
                 $component->getComponentParameters()->add($itemsParameters);
             }
 
+            $components[] = $component;
             $this->addComponent($component, $id);
         }
+        
+        return $components;
     }
 
     public function getListComponent($id)

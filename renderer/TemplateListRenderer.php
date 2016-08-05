@@ -2,9 +2,8 @@
 
 namespace ComponentModule\Renderer;
 
-use Nette\Utils\Html;
-use Wame\ComponentModule\Paremeters\Readers\ParameterReaders;
-use Wame\Core\Components\BaseControl;
+use Nette\InvalidArgumentException;
+use stdClass;
 use Wame\ListControl\ListControl;
 use Wame\ListControl\Renderer\SimpleListRenderer;
 
@@ -21,6 +20,12 @@ class TemplateListRenderer extends SimpleListRenderer
     function render($listControl)
     {   
         $components = $listControl->getListComponents();
+        
+        if(!is_array($components)) {
+            $e = new InvalidArgumentException("List has to return array of components.");
+            $e->components = $components;
+            throw $e;
+        }
         
         $listControl->template->hasComponents = boolval($components);
         $listControl->template->listContainer = $this->getContainer($listControl, $this->defaults['list']);
