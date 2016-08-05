@@ -31,6 +31,7 @@ class ProvidedListControl extends ListControl
 
         if (!is_array($items)) {
             $e = new InvalidArgumentException("Provider didn't return an array.");
+            $e->items = $items;
             $e->provider = $this->provider;
             throw $e;
         }
