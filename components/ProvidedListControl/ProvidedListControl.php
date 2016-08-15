@@ -2,6 +2,7 @@
 
 namespace Wame\ListControl\Components;
 
+use Nette\Application\UI\Control;
 use Nette\InvalidArgumentException;
 use Wame\ComponentModule\Paremeters\ArrayParameterSource;
 use Wame\Core\Components\BaseControl;
@@ -10,11 +11,14 @@ interface IProvidedListControl extends IEntityControlFactory
 {
 
     /** @return ProvidedListControl */
-    public function create($entity);
+    public function create($entity = null);
 }
 
 class ProvidedListControl extends ListControl
 {
+
+    /** @var Control[] */
+    private $listComponents;
 
     /** @var IListProvider */
     private $provider;
@@ -27,6 +31,10 @@ class ProvidedListControl extends ListControl
 
     public function getListComponents()
     {
+        if ($this->listComponents) {
+            return $this->listComponents;
+        }
+
         $items = $this->provider->find();
 
         if (!is_array($items)) {
@@ -41,8 +49,8 @@ class ProvidedListControl extends ListControl
             $itemsParameters = new ArrayParameterSource($itemsParameters);
         }
 
-        $components = [];
-        
+        $this->listComponents = [];
+
         foreach ($items as $id => $item) {
             $component = $this->componentFactory->create($item);
 
@@ -50,11 +58,11 @@ class ProvidedListControl extends ListControl
                 $component->getComponentParameters()->add($itemsParameters);
             }
 
-            $components[] = $component;
+            $this->listComponents[] = $component;
             $this->addComponent($component, $id);
         }
-        
-        return $components;
+
+        return $this->listComponents;
     }
 
     public function getListComponent($id)

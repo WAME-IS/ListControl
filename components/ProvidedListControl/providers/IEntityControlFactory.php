@@ -8,5 +8,5 @@ interface IEntityControlFactory
     /**
      * @param mixed $entity
      */
-    public function create($entity);
+    public function create($entity = null);
 }
