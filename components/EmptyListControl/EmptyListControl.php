@@ -20,6 +20,11 @@ abstract class EmptyListControl extends BaseControl
         }
     }
 
+    public function render()
+    {
+        
+    }
+    
     protected function componentRender()
     {
         $this->template->isEditable = $this->isEditable;

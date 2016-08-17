@@ -54,6 +54,8 @@ abstract class ListControl extends BaseControl
         if ($component) {
             $component->setParent($this, $id);
             return $component;
+        } else {
+            return parent::createComponent($id);
         }
     }
 
