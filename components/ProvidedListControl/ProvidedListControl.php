@@ -68,7 +68,9 @@ class ProvidedListControl extends ListControl
     public function getListComponent($id)
     {
         $item = $this->provider->get($id);
-        return $this->componentFactory->create($item);
+        if ($item) {
+            return $this->componentFactory->create($item);
+        }
     }
 
     public function createComponentNoItems()

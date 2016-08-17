@@ -2,7 +2,12 @@
 
 namespace Wame\ListControl\Components;
 
-abstract class ListControl extends \Wame\Core\Components\BaseControl
+use ComponentModule\Renderer\TemplateListRenderer;
+use Nette\ComponentModel\IComponent;
+use Wame\Core\Components\BaseControl;
+use Wame\ListControl\Renderer\IListRenderer;
+
+abstract class ListControl extends BaseControl
 {
 
     /** @var IListRenderer */
@@ -11,21 +16,23 @@ abstract class ListControl extends \Wame\Core\Components\BaseControl
     /**
      * Get all displayed components. They have to be in [id => component] format.
      * 
-     * @return \Nette\ComponentModel\IComponent[]
+     * @return IComponent[]
      */
     public abstract function getListComponents();
 
     /**
      * Get single displayed component by id.
      * 
-     * @return \Nette\ComponentModel\IComponent
+     * Note, this function cannot throw an exception.
+     * 
+     * @return IComponent
      */
     public abstract function getListComponent($id);
 
     /**
      * Get component used if there are no items.
      * 
-     * @return \Nette\ComponentModel\IComponent
+     * @return IComponent
      */
     public abstract function createComponentNoItems();
 
@@ -44,8 +51,10 @@ abstract class ListControl extends \Wame\Core\Components\BaseControl
     protected function createComponent($id)
     {
         $component = $this->getListComponent($id);
-        $component->setParent($this, $id);
-        return $component;
+        if ($component) {
+            $component->setParent($this, $id);
+            return $component;
+        }
     }
 
     /**
@@ -56,7 +65,7 @@ abstract class ListControl extends \Wame\Core\Components\BaseControl
     public function getRenderer()
     {
         if (!$this->renderer) {
-            $this->renderer = new \ComponentModule\Renderer\TemplateListRenderer();
+            $this->renderer = new TemplateListRenderer();
         }
         return $this->renderer;
     }
