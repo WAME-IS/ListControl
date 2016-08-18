@@ -36,7 +36,7 @@ class ProvidedListControl extends ListControl
         }
 
         $items = $this->provider->find();
-
+        
         if (!is_array($items)) {
             $e = new InvalidArgumentException("Provider didn't return an array.");
             $e->items = $items;
@@ -53,7 +53,7 @@ class ProvidedListControl extends ListControl
 
         foreach ($items as $id => $item) {
             $component = $this->componentFactory->create($item);
-
+            
             if ($itemsParameters && $component instanceof BaseControl) {
                 $component->getComponentParameters()->add($itemsParameters);
             }
