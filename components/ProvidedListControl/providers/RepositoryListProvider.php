@@ -28,6 +28,6 @@ class RepositoryListProvider implements IListProvider
 
     public function getReturnedType()
     {
-        return BaseEntity::class;
+        return $this->repository->getEntityName();
     }
 }
