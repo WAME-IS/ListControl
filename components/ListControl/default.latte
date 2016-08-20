@@ -3,13 +3,25 @@
 
     <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
 
-    {$listContainer->startTag()|noescape}
+    {if $listContainer}
+        {$listContainer->startTag()|noescape}
+    {/if}
+    
     {foreach $listComponents as $listComponentInfo}
-        {$listComponentInfo->container->startTag()|noescape}
+        {if $listComponentInfo->container}
+            {$listComponentInfo->container->startTag()|noescape}
+        {/if}
+
         {control $listComponentInfo->component}
-        {$listComponentInfo->container->endTag()|noescape}
+
+        {if $listComponentInfo->container}
+            {$listComponentInfo->container->endTag()|noescape}
+        {/if}
     {/foreach}
-    {$listContainer->endTag()|noescape}
+    
+    {if $listContainer}
+        {$listContainer->endTag()|noescape}
+    {/if}
 {else}
     {control noItems}
 {/if}
