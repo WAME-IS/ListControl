@@ -1,0 +1,3 @@
+services:
+    # Factories
+    - Wame\ListControl\Components\ISimpleEmptyListControlFactory

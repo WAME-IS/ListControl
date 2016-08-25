@@ -11,7 +11,7 @@ abstract class ListControl extends BaseControl
 {
 
     /** @var IListRenderer */
-    private $renderer;
+    protected $renderer;
 
     /**
      * Get all displayed components. They have to be in [id => component] format.

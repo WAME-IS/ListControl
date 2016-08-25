@@ -56,11 +56,17 @@ class SimpleListRenderer implements IListRenderer
         }
     }
 
-    private function renderComponents($components)
+    protected function renderComponents($components)
     {
         foreach ($components as $component) {
 
-            $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
+            $this->renderComponent($component);
+        }
+    }
+    
+    protected function renderComponent($component)
+    {
+        $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
 
             if ($listItemContainer) {
                 echo $listItemContainer->startTag();
@@ -75,7 +81,6 @@ class SimpleListRenderer implements IListRenderer
             if ($listItemContainer) {
                 echo $listItemContainer->endTag();
             }
-        }
     }
 
     /**

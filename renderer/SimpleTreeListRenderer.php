@@ -8,7 +8,7 @@ use Wame\ComponentModule\Paremeters\Readers\ParameterReaders;
 use Wame\Core\Components\BaseControl;
 use Wame\ListControl\Components\ListControl;
 
-class SimpleTreeListRenderer extends SimpleListRenderer
+class SimpleTreeListRenderer implements IListRenderer
 {
 
     public $defaults = [
@@ -35,19 +35,21 @@ class SimpleTreeListRenderer extends SimpleListRenderer
     function render($listControl)
     {
         $listContainer = $this->getContainer($listControl, $this->defaults['list']);
+        $itemsContainer = $this->getContainer($listControl, $this->defaults['items'], "itemsContainer");
+        $itemContainer = $this->getContainer($listControl, $this->defaults['item'], "itemContainer");
 
         if ($listContainer) {
             echo $listContainer->startTag();
         }
 
         $components = $listControl->getListComponents();
-        
-        if(!is_array($components)) {
+
+        if (!is_array($components)) {
             $e = new InvalidArgumentException("List has to return array of components.");
             $e->components = $components;
             throw $e;
         }
-        
+
         if ($components) {
             $this->renderComponents($components);
         } else {
@@ -62,15 +64,17 @@ class SimpleTreeListRenderer extends SimpleListRenderer
         }
     }
 
-    private function renderComponents($components)
+    private function renderComponents($components, $itemsContainer, $itemContainer)
     {
+        $this->renderContainerStart($itemsContainer);
+
         foreach ($components as $component) {
 
             $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
 
-            if ($listItemContainer) {
-                echo $listItemContainer->startTag();
-            }
+            $this->renderContainerStart($itemContainer);
+
+            $this->renderContainerStart($listItemContainer);
 
             if ($component instanceof BaseControl) {
                 $component->willRender("render");
@@ -78,10 +82,16 @@ class SimpleTreeListRenderer extends SimpleListRenderer
                 $component->render();
             }
 
-            if ($listItemContainer) {
-                echo $listItemContainer->endTag();
+            $this->renderContainerEnd($listItemContainer);
+            
+            if($component->childNodes) {
+                renderComponents($component->childNodes, $itemsContainer, $itemContainer);
             }
+
+            $this->renderContainerEnd($itemContainer);
         }
+
+        $this->renderContainerEnd($itemsContainer);
     }
 
     /**
@@ -91,14 +101,36 @@ class SimpleTreeListRenderer extends SimpleListRenderer
      * @param array $defaultParams
      * @return Html
      */
-    protected function getContainer($control, $defaultParams)
+    protected function getContainer($control, $defaultParams, $paramName = "container")
     {
-        $containerParams = $control->getComponentParameter("container", ParameterReaders::$HTML);
+        $containerParams = $control->getComponentParameter($paramName, ParameterReaders::$HTML);
         $containerParams = array_replace_recursive($defaultParams, $containerParams);
 
         if (array_key_exists('tag', $containerParams) && $tag = $containerParams['tag']) {
             unset($containerParams['tag']);
             return Html::el($tag, $containerParams);
+        }
+    }
+    
+    /**
+     * @param Html $container
+     * @param Control $control
+     */
+    private function renderContainerStart($container)
+    {
+        if ($container) {
+            echo $container->startTag();
+        }
+    }
+
+    /**
+     * @param Html $container
+     * @param Control $control
+     */
+    private function renderContainerEnd($container)
+    {
+        if ($container) {
+            echo $container->endTag();
         }
     }
 

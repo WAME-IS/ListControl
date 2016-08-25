@@ -5,11 +5,10 @@ namespace ComponentModule\Renderer;
 use Nette\InvalidArgumentException;
 use stdClass;
 use Wame\ListControl\ListControl;
-use Wame\ListControl\Renderer\SimpleListRenderer;
+use Wame\ListControl\Renderer\SimpleTreeListRenderer;
 
-class TemplateListRenderer extends SimpleListRenderer
+class TemplateTreeListRenderer extends SimpleTreeListRenderer
 {
-
 
     /**
      * Provides complete list rendering.
@@ -28,6 +27,8 @@ class TemplateListRenderer extends SimpleListRenderer
         }
         
         $listControl->template->hasComponents = boolval($components);
+        $listControl->template->itemsContainer =  $this->getContainer($listControl, $this->defaults['items']);
+        $listControl->template->itemContainer =  $this->getContainer($listControl, $this->defaults['item']);
         $listControl->template->listContainer = $this->getContainer($listControl, $this->defaults['list']);
 
         $listComponents = [];

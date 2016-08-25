@@ -1,18 +1,17 @@
 {if $listComponents}
-    {block header}
-        <h2 n:if="$control->getComponentParameter('showTitle')">{$control->getTitle()}</h2>
-        <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
-    {/block}
-    
+    <h2 n:if="$control->getComponentParameter('showTitle')">{$control->getTitle()}</h2>
+
+    <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
+
     {if $listContainer}
         {$listContainer->startTag()|noescape}
     {/if}
     
-    {block items}
+    {block listLevel}
         {if $itemsContainer}
             {$itemsContainer->startTag()|noescape}
         {/if}
-
+    
         {foreach $listComponents as $listComponentInfo}
             {if $itemContainer}
                 {$itemContainer->startTag()|noescape}
@@ -28,17 +27,18 @@
                 {$listComponentInfo->container->endTag()|noescape}
             {/if}
             
+            {include listLevel}
+            
             {if $itemContainer}
                 {$itemContainer->endTag()|noescape}
             {/if}
-            
         {/foreach}
         
         {if $itemsContainer}
             {$itemsContainer->endTag()|noescape}
         {/if}
     {/block}
-    
+        
     {if $listContainer}
         {$listContainer->endTag()|noescape}
     {/if}

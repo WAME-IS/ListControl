@@ -6,32 +6,40 @@ use Nette\Application\UI\Control;
 use Nette\InvalidArgumentException;
 use Wame\ComponentModule\Paremeters\ArrayParameterSource;
 use Wame\Core\Components\BaseControl;
+use Wame\Utils\Tree\ITreeBuilder;
+use Wame\Utils\Tree\NestedSetTreeBuilder;
 
-interface IProvidedListControl extends IEntityControlFactory
+interface IProvidedTreeListControl extends IEntityControlFactory
 {
 
     /** @return ProvidedListControl */
     public function create($entity = null);
 }
 
-class ProvidedListControl extends ListControl
+class ProvidedTreeListControl extends TreeListControl
 {
 
     /** @var Control[] */
     private $listComponents;
 
     /** @var IListProvider */
-    protected $provider;
+    private $provider;
 
     /** @var IEntityControlFactory */
-    protected $componentFactory;
+    private $componentFactory;
 
     /** @var object */
-    protected $noItemsFactory;
+    private $noItemsFactory;
+    
+    /** @var ITreeBuilder */
+    private $treeBuilder;
 
+    /** @var \Wame\Utils\Tree\TreeNode */
+    private $tree;
+    
     public function getListComponents()
     {
-        if (is_array($this->listComponents)) {
+        if ($this->listComponents) {
             return $this->listComponents;
         }
 
@@ -43,6 +51,8 @@ class ProvidedListControl extends ListControl
             $e->provider = $this->provider;
             throw $e;
         }
+        
+        $tree = $this->getTreeBuilder()->buildTree($items);
 
         $itemsParameters = $this->getComponentParameter('itemsParameters');
         if ($itemsParameters) {
@@ -51,6 +61,8 @@ class ProvidedListControl extends ListControl
 
         $this->listComponents = [];
 
+        $this->getListComponentsItem($tree);
+        
         foreach ($items as $id => $item) {
             $component = $this->componentFactory->create($item);
             
@@ -63,6 +75,11 @@ class ProvidedListControl extends ListControl
         }
 
         return $this->listComponents;
+    }
+    
+    private function getListComponentsItem($node)
+    {
+        
     }
 
     public function getListComponent($id)
@@ -124,5 +141,28 @@ class ProvidedListControl extends ListControl
     function setNoItemsFactory($noItemsFactory)
     {
         $this->noItemsFactory = $noItemsFactory;
+    }
+    
+    /**
+     * Gets builder used to build trees from flat array
+     * 
+     * @return ITreeBuilder
+     */
+    public function getTreeBuilder()
+    {
+        if (!$this->treeBuilder) {
+            $this->treeBuilder = new NestedSetTreeBuilder();
+        }
+        return $this->treeBuilder;
+    }
+
+    /**
+     * Sets builder used to build trees from flat array
+     * 
+     * @param ITreeBuilder $treeBuilder
+     */
+    public function setTreeBuilder(ITreeBuilder $treeBuilder)
+    {
+        $this->treeBuilder = $treeBuilder;
     }
 }
