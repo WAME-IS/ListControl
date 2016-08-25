@@ -1,0 +1,47 @@
+{if $listComponents}
+    {block header}
+        <h2 n:if="$control->getComponentParameter('showTitle')">{$control->getTitle()}</h2>
+        <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
+    {/block}
+    
+    {if $listContainer}
+        {$listContainer->startTag()|noescape}
+    {/if}
+    
+    {block items}
+        {if $itemsContainer}
+            {$itemsContainer->startTag()|noescape}
+        {/if}
+
+        {foreach $listComponents as $listComponentInfo}
+            {if $itemContainer}
+                {$itemContainer->startTag()|noescape}
+            {/if}
+            
+            {if $listComponentInfo->container}
+                {$listComponentInfo->container->startTag()|noescape}
+            {/if}
+
+            {control $listComponentInfo->component}
+
+            {if $listComponentInfo->container}
+                {$listComponentInfo->container->endTag()|noescape}
+            {/if}
+            
+            {if $itemContainer}
+                {$itemContainer->endTag()|noescape}
+            {/if}
+            
+        {/foreach}
+        
+        {if $itemsContainer}
+            {$itemsContainer->endTag()|noescape}
+        {/if}
+    {/block}
+    
+    {if $listContainer}
+        {$listContainer->endTag()|noescape}
+    {/if}
+{else}
+    {control noItems}
+{/if}
