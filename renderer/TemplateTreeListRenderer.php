@@ -27,23 +27,24 @@ class TemplateTreeListRenderer extends SimpleTreeListRenderer
         }
         
         $listControl->template->hasComponents = boolval($components);
-        $listControl->template->itemsContainer =  $this->getContainer($listControl, $this->defaults['items']);
-        $listControl->template->itemContainer =  $this->getContainer($listControl, $this->defaults['item']);
+        $listControl->template->treeContainer =  $this->getContainer($listControl, $this->defaults['tree'], 'treeContainer');
+        $listControl->template->treeItemContainer =  $this->getContainer($listControl, $this->defaults['treeItem'], 'treeItemContainer');
         $listControl->template->listContainer = $this->getContainer($listControl, $this->defaults['list']);
 
         $listComponents = [];
         
-        foreach ($components as $component) {
-
-            $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
-
-            $listComponentInfo = new stdClass;
-            $listComponentInfo->container = $listItemContainer;
-            $listComponentInfo->component = $component;
-            $listComponents[] = $listComponentInfo;
+        $this->prepareContainers($components);
+        
+        $listControl->template->listComponents = $components;
+    }
+    
+    private function prepareContainers($components) {
+        foreach($components as $componentNode) {
+            $componentNode->container = $this->getContainer($componentNode->getComponent(), $this->defaults['listItem']);
+            if($componentNode->childNodes) {
+                $this->prepareContainers($componentNode->childNodes);
+            }
         }
-
-        $listControl->template->listComponents = $listComponents;
     }
     
     /**

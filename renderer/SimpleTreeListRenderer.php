@@ -18,10 +18,10 @@ class SimpleTreeListRenderer implements IListRenderer
         'listItem' => [
             'tag' => 'div'
         ],
-        'items' => [
+        'tree' => [
             'tag' => 'ul'
         ],
-        'item' => [
+        'treeItem' => [
             'tag' => 'li'
         ]
     ];
@@ -35,12 +35,10 @@ class SimpleTreeListRenderer implements IListRenderer
     function render($listControl)
     {
         $listContainer = $this->getContainer($listControl, $this->defaults['list']);
-        $itemsContainer = $this->getContainer($listControl, $this->defaults['items'], "itemsContainer");
-        $itemContainer = $this->getContainer($listControl, $this->defaults['item'], "itemContainer");
+        $treeContainer = $this->getContainer($listControl, $this->defaults['tree'], "treeContainer");
+        $treeItemContainer = $this->getContainer($listControl, $this->defaults['treeItem'], "treeItemContainer");
 
-        if ($listContainer) {
-            echo $listContainer->startTag();
-        }
+        $this->renderContainerStart($listContainer);
 
         $components = $listControl->getListComponents();
 
@@ -51,7 +49,7 @@ class SimpleTreeListRenderer implements IListRenderer
         }
 
         if ($components) {
-            $this->renderComponents($components);
+            $this->renderComponents($components, $treeContainer, $treeItemContainer);
         } else {
             $noItems = $listControl->getComponent('noItems', FALSE);
             if ($noItems) {
@@ -59,20 +57,20 @@ class SimpleTreeListRenderer implements IListRenderer
             }
         }
 
-        if ($listContainer) {
-            echo $listContainer->endTag();
-        }
+        $this->renderContainerEnd($listContainer);
     }
 
-    private function renderComponents($components, $itemsContainer, $itemContainer)
+    private function renderComponents($components, $treeContainer, $treeItemContainer)
     {
-        $this->renderContainerStart($itemsContainer);
+        $this->renderContainerStart($treeContainer);
 
-        foreach ($components as $component) {
+        foreach ($components as $componentNode) {
 
+            $component = $componentNode->getComponent();
+            
             $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
 
-            $this->renderContainerStart($itemContainer);
+            $this->renderContainerStart($treeItemContainer);
 
             $this->renderContainerStart($listItemContainer);
 
@@ -84,14 +82,14 @@ class SimpleTreeListRenderer implements IListRenderer
 
             $this->renderContainerEnd($listItemContainer);
             
-            if($component->childNodes) {
-                renderComponents($component->childNodes, $itemsContainer, $itemContainer);
+            if($componentNode->childNodes) {
+                $this->renderComponents($componentNode->childNodes, $treeContainer, $treeItemContainer);
             }
 
-            $this->renderContainerEnd($itemContainer);
+            $this->renderContainerEnd($treeItemContainer);
         }
 
-        $this->renderContainerEnd($itemsContainer);
+        $this->renderContainerEnd($treeContainer);
     }
 
     /**

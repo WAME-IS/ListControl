@@ -2,12 +2,13 @@
 
 namespace Wame\ListControl\Components;
 
-use Nette\Application\UI\Control;
+use Nette\ComponentModel\Component;
 use Nette\InvalidArgumentException;
 use Wame\ComponentModule\Paremeters\ArrayParameterSource;
 use Wame\Core\Components\BaseControl;
 use Wame\Utils\Tree\ITreeBuilder;
 use Wame\Utils\Tree\NestedSetTreeBuilder;
+use Wame\Utils\Tree\TreeNode;
 
 interface IProvidedTreeListControl extends IEntityControlFactory
 {
@@ -16,11 +17,65 @@ interface IProvidedTreeListControl extends IEntityControlFactory
     public function create($entity = null);
 }
 
-class ProvidedTreeListControl extends TreeListControl
+class TreeListNode
 {
 
-    /** @var Control[] */
-    private $listComponents;
+    /** @var int */
+    public $id;
+
+    /** @var mixed */
+    public $item;
+
+    /** @var Component */
+    public $component;
+
+    /** @var \Nette\Utils\Html */
+    public $container;
+
+    public function __construct($id, $item)
+    {
+        $this->id = $id;
+        $this->item = $item;
+    }
+
+    function getId()
+    {
+        return $this->id;
+    }
+
+    function getItem()
+    {
+        return $this->item;
+    }
+
+    function getComponent()
+    {
+        return $this->component;
+    }
+
+    function setComponent(Component $component)
+    {
+        $this->component = $component;
+    }
+
+    function getContainer()
+    {
+        return $this->container;
+    }
+
+    function setContainer(\Nette\Utils\Html $container)
+    {
+        $this->container = $container;
+    }
+
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array([$this->item, $name], $arguments);
+    }
+}
+
+class ProvidedTreeListControl extends TreeListControl
+{
 
     /** @var IListProvider */
     private $provider;
@@ -30,56 +85,51 @@ class ProvidedTreeListControl extends TreeListControl
 
     /** @var object */
     private $noItemsFactory;
-    
+
     /** @var ITreeBuilder */
     private $treeBuilder;
 
-    /** @var \Wame\Utils\Tree\TreeNode */
+    /** @var TreeNode */
     private $tree;
-    
+
     public function getListComponents()
     {
-        if ($this->listComponents) {
-            return $this->listComponents;
+        if ($this->tree) {
+            return $this->tree;
         }
 
         $items = $this->provider->find();
-        
+
         if (!is_array($items)) {
             $e = new InvalidArgumentException("Provider didn't return an array.");
             $e->items = $items;
             $e->provider = $this->provider;
             throw $e;
         }
-        
-        $tree = $this->getTreeBuilder()->buildTree($items);
+
+        $items = array_map(function($item, $index) {
+            return new TreeListNode($index, $item);
+        }, $items, array_keys($items));
+
+        $this->tree = [$this->getTreeBuilder()->buildTree($items)];
 
         $itemsParameters = $this->getComponentParameter('itemsParameters');
         if ($itemsParameters) {
             $itemsParameters = new ArrayParameterSource($itemsParameters);
         }
 
-        $this->listComponents = [];
+        foreach ($items as $processingItem) {
+            $component = $this->componentFactory->create($processingItem->getItem());
 
-        $this->getListComponentsItem($tree);
-        
-        foreach ($items as $id => $item) {
-            $component = $this->componentFactory->create($item);
-            
             if ($itemsParameters && $component instanceof BaseControl) {
                 $component->getComponentParameters()->add($itemsParameters);
             }
 
-            $this->listComponents[] = $component;
-            $this->addComponent($component, $id);
+            $this->addComponent($component, $processingItem->getId());
+            $processingItem->setComponent($component);
         }
 
-        return $this->listComponents;
-    }
-    
-    private function getListComponentsItem($node)
-    {
-        
+        return $this->tree;
     }
 
     public function getListComponent($id)
@@ -142,7 +192,7 @@ class ProvidedTreeListControl extends TreeListControl
     {
         $this->noItemsFactory = $noItemsFactory;
     }
-    
+
     /**
      * Gets builder used to build trees from flat array
      * 
