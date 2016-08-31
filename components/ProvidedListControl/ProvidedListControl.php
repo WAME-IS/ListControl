@@ -75,6 +75,9 @@ class ProvidedListControl extends ListControl
 
     public function createComponentNoItems()
     {
+        if(!$this->noItemsFactory) {
+            throw new InvalidArgumentException("noItemsFactory has to be set ".get_class($this).".");
+        }
         return $this->noItemsFactory->create();
     }
 
