@@ -17,6 +17,8 @@ interface IProvidedListControl extends IEntityControlFactory
 class ProvidedListControl extends ListControl
 {
 
+    const ITEM_PARAMETERS_NAME = 'itemsParameters';
+    
     /** @var Control[] */
     private $listComponents;
 
@@ -44,7 +46,7 @@ class ProvidedListControl extends ListControl
             throw $e;
         }
 
-        $itemsParameters = $this->getComponentParameter('itemsParameters');
+        $itemsParameters = $this->getComponentParameter(self::ITEM_PARAMETERS_NAME);
         if ($itemsParameters) {
             $itemsParameters = new ArrayParameterSource($itemsParameters);
         }
