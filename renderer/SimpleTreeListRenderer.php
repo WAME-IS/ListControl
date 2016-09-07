@@ -3,28 +3,22 @@
 namespace Wame\ListControl\Renderer;
 
 use Nette\InvalidArgumentException;
-use Nette\Utils\Html;
-use Wame\ComponentModule\Paremeters\Readers\ParameterReaders;
+use Wame\ComponentModule\Helpers\Helpers;
 use Wame\Core\Components\BaseControl;
 use Wame\ListControl\Components\ListControl;
 
 class SimpleTreeListRenderer implements IListRenderer
 {
 
-    public $defaults = [
-        'list' => [
-            'tag' => 'div'
-        ],
-        'listItem' => [
-            'tag' => 'div'
-        ],
-        'tree' => [
+    const
+        PARAM_TREE_CONTAINER = 'treeContainer',
+        TREE_CONTAINER_DEFAULT = [
             'tag' => 'ul'
         ],
-        'treeItem' => [
+        PARAM_TREE_ITEM_CONTAINER = 'treeItemContainer',
+        TREE_ITEM_CONTAINER_DEFAULT = [
             'tag' => 'li'
-        ]
-    ];
+        ];
 
     /**
      * Provides complete list rendering.
@@ -34,11 +28,8 @@ class SimpleTreeListRenderer implements IListRenderer
      */
     function render($listControl)
     {
-        $listContainer = $this->getContainer($listControl, $this->defaults['list']);
-        $treeContainer = $this->getContainer($listControl, $this->defaults['tree'], "treeContainer");
-        $treeItemContainer = $this->getContainer($listControl, $this->defaults['treeItem'], "treeItemContainer");
-
-        $this->renderContainerStart($listContainer);
+        $treeContainer = Helpers::getContainer($listControl, self::TREE_CONTAINER_DEFAULT, self::PARAM_TREE_CONTAINER);
+        $treeItemContainer = Helpers::getContainer($listControl, self::TREE_ITEM_CONTAINER_DEFAULT, self::PARAM_TREE_ITEM_CONTAINER);
 
         $components = $listControl->getListComponents();
 
@@ -56,23 +47,17 @@ class SimpleTreeListRenderer implements IListRenderer
                 $noItems->render();
             }
         }
-
-        $this->renderContainerEnd($listContainer);
     }
 
     private function renderComponents($components, $treeContainer, $treeItemContainer)
     {
-        $this->renderContainerStart($treeContainer);
+        Helpers::renderContainerStart($treeContainer);
 
         foreach ($components as $componentNode) {
 
             $component = $componentNode->getComponent();
-            
-            $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
 
-            $this->renderContainerStart($treeItemContainer);
-
-            $this->renderContainerStart($listItemContainer);
+            Helpers::renderContainerStart($treeItemContainer);
 
             if ($component instanceof BaseControl) {
                 $component->willRender("render");
@@ -80,56 +65,14 @@ class SimpleTreeListRenderer implements IListRenderer
                 $component->render();
             }
 
-            $this->renderContainerEnd($listItemContainer);
-            
-            if($componentNode->childNodes) {
+            if ($componentNode->childNodes) {
                 $this->renderComponents($componentNode->childNodes, $treeContainer, $treeItemContainer);
             }
 
-            $this->renderContainerEnd($treeItemContainer);
+            Helpers::renderContainerEnd($treeItemContainer);
         }
 
-        $this->renderContainerEnd($treeContainer);
-    }
-
-    /**
-     * Get HTML container
-     * 
-     * @param BaseControl $control
-     * @param array $defaultParams
-     * @return Html
-     */
-    protected function getContainer($control, $defaultParams, $paramName = "container")
-    {
-        $containerParams = $control->getComponentParameter($paramName, ParameterReaders::$HTML);
-        $containerParams = array_replace_recursive($defaultParams, $containerParams);
-
-        if (array_key_exists('tag', $containerParams) && $tag = $containerParams['tag']) {
-            unset($containerParams['tag']);
-            return Html::el($tag, $containerParams);
-        }
-    }
-    
-    /**
-     * @param Html $container
-     * @param Control $control
-     */
-    private function renderContainerStart($container)
-    {
-        if ($container) {
-            echo $container->startTag();
-        }
-    }
-
-    /**
-     * @param Html $container
-     * @param Control $control
-     */
-    private function renderContainerEnd($container)
-    {
-        if ($container) {
-            echo $container->endTag();
-        }
+        Helpers::renderContainerEnd($treeContainer);
     }
 
     /**

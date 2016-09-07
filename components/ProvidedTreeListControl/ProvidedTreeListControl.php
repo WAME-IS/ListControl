@@ -29,9 +29,6 @@ class TreeListNode
     /** @var Component */
     public $component;
 
-    /** @var \Nette\Utils\Html */
-    public $container;
-
     public function __construct($id, $item)
     {
         $this->id = $id;
@@ -58,16 +55,6 @@ class TreeListNode
         $this->component = $component;
     }
 
-    function getContainer()
-    {
-        return $this->container;
-    }
-
-    function setContainer(\Nette\Utils\Html $container)
-    {
-        $this->container = $container;
-    }
-
     public function __call($name, $arguments)
     {
         return call_user_func_array([$this->item, $name], $arguments);
@@ -76,6 +63,7 @@ class TreeListNode
 
 class ProvidedTreeListControl extends TreeListControl
 {
+    const PARAM_HIDE_FIRST = 'hideFirst';
 
     /** @var IListProvider */
     private $provider;
@@ -111,7 +99,12 @@ class ProvidedTreeListControl extends TreeListControl
             return new TreeListNode($index, $item);
         }, $items, array_keys($items));
 
-        $this->tree = [$this->getTreeBuilder()->buildTree($items)];
+        $branches = $this->getTreeBuilder()->buildTree($items);
+        if($this->getComponentParameter(self::PARAM_HIDE_FIRST)) {
+            $this->tree = $branches->childNodes;
+        } else {
+            $this->tree = [$branches];
+        }
 
         $itemsParameters = $this->getComponentParameter('itemsParameters');
         if ($itemsParameters) {

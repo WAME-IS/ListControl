@@ -2,10 +2,6 @@
     <h2 n:if="$control->getComponentParameter('showTitle')">{$control->getTitle()}</h2>
 
     <p n:if="$control->getComponentParameter('showDescription')">{$control->getDescription()}</p>
-
-    {if $listContainer}
-        {$listContainer->startTag()|noescape}
-    {/if}
     
     {define listLevel}
         {if $treeContainer}
@@ -17,15 +13,7 @@
                 {$treeItemContainer->startTag()|noescape}
             {/if}
             
-            {if $componentNode->container}
-                {$componentNode->container->startTag()|noescape}
-            {/if}
-
             {control $componentNode->component}
-
-            {if $componentNode->container}
-                {$componentNode->container->endTag()|noescape}
-            {/if}
             
             {if $componentNode->childNodes}
                 {include listLevel components=>$componentNode->childNodes}
@@ -43,9 +31,6 @@
     
     {include listLevel components=>$listComponents}
     
-    {if $listContainer}
-        {$listContainer->endTag()|noescape}
-    {/if}
 {else}
     {control noItems}
 {/if}

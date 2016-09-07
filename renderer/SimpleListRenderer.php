@@ -3,21 +3,21 @@
 namespace Wame\ListControl\Renderer;
 
 use Nette\InvalidArgumentException;
-use Nette\Utils\Html;
-use Wame\ComponentModule\Paremeters\Readers\ParameterReaders;
+use Wame\ComponentModule\Helpers\Helpers;
 use Wame\Core\Components\BaseControl;
 use Wame\ListControl\Components\ListControl;
 
 class SimpleListRenderer implements IListRenderer
 {
 
-    public $defaults = [
-        'list' => [
-            'tag' => 'div'
+    const
+        PARAM_LIST_CONTAINER = 'listContainer',
+        LIST_CONTAINER_DEFAULT = [
+        'tag' => 'div'
         ],
-        'listItem' => [
-            'tag' => 'div'
-        ]
+        PARAM_LIST_ITEM_CONTAINER = 'listItemContainer',
+        LIST_ITEM_CONTAINER_DEFAULT = [
+        'tag' => 'div'
     ];
 
     /**
@@ -28,20 +28,18 @@ class SimpleListRenderer implements IListRenderer
      */
     function render($listControl)
     {
-        $listContainer = $this->getContainer($listControl, $this->defaults['list']);
+        $listContainer = Helpers::getContainer($listControl, self::LIST_CONTAINER_DEFAULT, self::PARAM_LIST_CONTAINER);
 
-        if ($listContainer) {
-            echo $listContainer->startTag();
-        }
+        Helpers::renderContainerStart($listContainer);
 
         $components = $listControl->getListComponents();
-        
-        if(!is_array($components)) {
+
+        if (!is_array($components)) {
             $e = new InvalidArgumentException("List has to return array of components.");
             $e->components = $components;
             throw $e;
         }
-        
+
         if ($components) {
             $this->renderComponents($components);
         } else {
@@ -51,54 +49,29 @@ class SimpleListRenderer implements IListRenderer
             }
         }
 
-        if ($listContainer) {
-            echo $listContainer->endTag();
-        }
+        Helpers::renderContainerEnd($listContainer);
     }
 
     protected function renderComponents($components)
     {
         foreach ($components as $component) {
-
             $this->renderComponent($component);
         }
     }
-    
+
     protected function renderComponent($component)
     {
-        $listItemContainer = $this->getContainer($component, $this->defaults['listItem']);
+        $listItemContainer = Helpers::getContainer($component, self::LIST_ITEM_CONTAINER_DEFAULT, self::PARAM_LIST_ITEM_CONTAINER);
 
-            if ($listItemContainer) {
-                echo $listItemContainer->startTag();
-            }
+        Helpers::renderContainerStart($listItemContainer);
 
-            if ($component instanceof BaseControl) {
-                $component->willRender("render");
-            } else {
-                $component->render();
-            }
-
-            if ($listItemContainer) {
-                echo $listItemContainer->endTag();
-            }
-    }
-
-    /**
-     * Get HTML container
-     * 
-     * @param BaseControl $control
-     * @param array $defaultParams
-     * @return Html
-     */
-    protected function getContainer($control, $defaultParams)
-    {
-        $containerParams = $control->getComponentParameter("container", ParameterReaders::$HTML);
-        $containerParams = array_replace_recursive($defaultParams, $containerParams);
-
-        if (array_key_exists('tag', $containerParams) && $tag = $containerParams['tag']) {
-            unset($containerParams['tag']);
-            return Html::el($tag, $containerParams);
+        if ($component instanceof BaseControl) {
+            $component->willRender("render");
+        } else {
+            $component->render();
         }
+
+        Helpers::renderContainerEnd($listItemContainer);
     }
 
     /**

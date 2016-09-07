@@ -3,7 +3,7 @@
 namespace ComponentModule\Renderer;
 
 use Nette\InvalidArgumentException;
-use stdClass;
+use Wame\ComponentModule\Helpers\Helpers;
 use Wame\ListControl\ListControl;
 use Wame\ListControl\Renderer\SimpleTreeListRenderer;
 
@@ -19,34 +19,21 @@ class TemplateTreeListRenderer extends SimpleTreeListRenderer
     function render($listControl)
     {
         $components = $listControl->getListComponents();
-        
-        if(!is_array($components)) {
+
+        if (!is_array($components)) {
             $e = new InvalidArgumentException("List has to return array of components.");
             $e->components = $components;
             throw $e;
         }
-        
-        $listControl->template->hasComponents = boolval($components);
-        $listControl->template->treeContainer =  $this->getContainer($listControl, $this->defaults['tree'], 'treeContainer');
-        $listControl->template->treeItemContainer =  $this->getContainer($listControl, $this->defaults['treeItem'], 'treeItemContainer');
-        $listControl->template->listContainer = $this->getContainer($listControl, $this->defaults['list']);
 
-        $listComponents = [];
-        
-        $this->prepareContainers($components);
-        
+        $listControl->template->hasComponents = boolval($components);
+
+        $listControl->template->treeContainer = Helpers::getContainer($listControl, SimpleTreeListRenderer::TREE_CONTAINER_DEFAULT, SimpleTreeListRenderer::PARAM_TREE_CONTAINER);
+        $listControl->template->treeItemContainer = Helpers::getContainer($listControl, SimpleTreeListRenderer::TREE_ITEM_CONTAINER_DEFAULT, SimpleTreeListRenderer::PARAM_TREE_ITEM_CONTAINER);
+
         $listControl->template->listComponents = $components;
     }
-    
-    private function prepareContainers($components) {
-        foreach($components as $componentNode) {
-            $componentNode->container = $this->getContainer($componentNode->getComponent(), $this->defaults['listItem']);
-            if($componentNode->childNodes) {
-                $this->prepareContainers($componentNode->childNodes);
-            }
-        }
-    }
-    
+
     /**
      * @return boolean Whenever this renderer requires to call template->render()
      */

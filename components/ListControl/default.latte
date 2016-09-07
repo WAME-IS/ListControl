@@ -7,15 +7,15 @@
         {$listContainer->startTag()|noescape}
     {/if}
     
-    {foreach $listComponents as $listComponentInfo}
-        {if $listComponentInfo->container}
-            {$listComponentInfo->container->startTag()|noescape}
+    {foreach $listComponents as $component}
+        {if $listItemContainer}
+            {$listItemContainer->startTag()|noescape}
         {/if}
 
-        {control $listComponentInfo->component}
+        {control $component}
 
-        {if $listComponentInfo->container}
-            {$listComponentInfo->container->endTag()|noescape}
+        {if $listItemContainer}
+            {$listItemContainer->endTag()|noescape}
         {/if}
     {/foreach}
     
