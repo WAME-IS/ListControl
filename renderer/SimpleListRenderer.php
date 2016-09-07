@@ -13,13 +13,13 @@ class SimpleListRenderer implements IListRenderer
     const
         PARAM_LIST_CONTAINER = 'listContainer',
         LIST_CONTAINER_DEFAULT = [
-            'tag' => 'div',
-            'class' => 'listItems'
+        'tag' => 'div',
+        'class' => 'listItems'
         ],
         PARAM_LIST_ITEM_CONTAINER = 'listItemContainer',
         LIST_ITEM_CONTAINER_DEFAULT = [
-            'tag' => 'div'
-        ];
+        'tag' => 'div'
+    ];
 
     /**
      * Provides complete list rendering.
@@ -30,8 +30,7 @@ class SimpleListRenderer implements IListRenderer
     function render($listControl)
     {
         $listContainer = Helpers::getContainer($listControl, self::LIST_CONTAINER_DEFAULT, self::PARAM_LIST_CONTAINER);
-
-        Helpers::renderContainerStart($listContainer);
+        $listItemContainer = Helpers::getContainer($listControl, self::LIST_ITEM_CONTAINER_DEFAULT, self::PARAM_LIST_ITEM_CONTAINER);
 
         $components = $listControl->getListComponents();
 
@@ -42,28 +41,28 @@ class SimpleListRenderer implements IListRenderer
         }
 
         if ($components) {
-            $this->renderComponents($components);
+            $this->renderComponents($components, $listContainer, $listItemContainer);
         } else {
             $noItems = $listControl->getComponent('noItems', FALSE);
             if ($noItems) {
                 $noItems->render();
             }
         }
+    }
 
+    protected function renderComponents($components, $listContainer, $listItemContainer)
+    {
+        Helpers::renderContainerStart($listContainer);
+        
+        foreach ($components as $component) {
+            $this->renderComponent($component, $listItemContainer);
+        }
+        
         Helpers::renderContainerEnd($listContainer);
     }
 
-    protected function renderComponents($components)
+    protected function renderComponent($component, $listItemContainer)
     {
-        foreach ($components as $component) {
-            $this->renderComponent($component);
-        }
-    }
-
-    protected function renderComponent($component)
-    {
-        $listItemContainer = Helpers::getContainer($component, self::LIST_ITEM_CONTAINER_DEFAULT, self::PARAM_LIST_ITEM_CONTAINER);
-
         Helpers::renderContainerStart($listItemContainer);
 
         if ($component instanceof BaseControl) {
