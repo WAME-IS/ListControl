@@ -13,13 +13,13 @@ class SimpleListRenderer implements IListRenderer
     const
         PARAM_LIST_CONTAINER = 'listContainer',
         LIST_CONTAINER_DEFAULT = [
-        'tag' => 'div',
-        'class' => 'listItems'
+            'tag' => 'div',
+            'class' => 'listItems'
         ],
         PARAM_LIST_ITEM_CONTAINER = 'listItemContainer',
         LIST_ITEM_CONTAINER_DEFAULT = [
-        'tag' => 'div'
-    ];
+            'tag' => 'div'
+        ];
 
     /**
      * Provides complete list rendering.
