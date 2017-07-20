@@ -7,17 +7,18 @@ use Nette\InvalidArgumentException;
 use Wame\ComponentModule\Paremeters\ArrayParameterSource;
 use Wame\Core\Components\BaseControl;
 
+
 interface IProvidedListControl extends IEntityControlFactory
 {
-
     /** @return ProvidedListControl */
     public function create($entity = null);
 }
 
+
 class ProvidedListControl extends ListControl
 {
-
     const PARAM_ITEM_PARAMETERS = 'itemsParameters';
+
     
     /** @var Control[] */
     private $listComponents;
@@ -31,6 +32,12 @@ class ProvidedListControl extends ListControl
     /** @var object */
     protected $noItemsFactory;
 
+
+    /**
+     * Get list components
+     *
+     * @return array|\Nette\Application\UI\Control[]
+     */
     public function getListComponents()
     {
         if (is_array($this->listComponents)) {
@@ -67,21 +74,38 @@ class ProvidedListControl extends ListControl
         return $this->listComponents;
     }
 
+
+    /**
+     * Get list component
+     *
+     * @param int $id
+     *
+     * @return mixed
+     */
     public function getListComponent($id)
     {
         $item = $this->provider->get($id);
+
         if ($item) {
             return $this->componentFactory->create($item);
         }
     }
 
+
+    /**
+     * No items component
+     *
+     * @return mixed
+     */
     public function createComponentNoItems()
     {
-        if(!$this->noItemsFactory) {
+        if (!$this->noItemsFactory) {
             throw new InvalidArgumentException("noItemsFactory has to be set ".get_class($this).".");
         }
+
         return $this->noItemsFactory->create();
     }
+
 
     /**
      * @return IListProvider
@@ -91,6 +115,7 @@ class ProvidedListControl extends ListControl
         return $this->provider;
     }
 
+
     /**
      * @return IEntityControlFactory
      */
@@ -98,6 +123,7 @@ class ProvidedListControl extends ListControl
     {
         return $this->componentFactory;
     }
+
 
     /**
      * @return object
@@ -107,6 +133,7 @@ class ProvidedListControl extends ListControl
         return $this->noItemsFactory;
     }
 
+
     /**
      * @param IListProvider $provider
      */
@@ -114,6 +141,7 @@ class ProvidedListControl extends ListControl
     {
         $this->provider = $provider;
     }
+
 
     /**
      * @param IEntityControlFactory $componentFactory
@@ -123,6 +151,7 @@ class ProvidedListControl extends ListControl
         $this->componentFactory = $componentFactory;
     }
 
+
     /**
      * @param object $noItemsFactory
      */
@@ -130,4 +159,5 @@ class ProvidedListControl extends ListControl
     {
         $this->noItemsFactory = $noItemsFactory;
     }
+
 }
