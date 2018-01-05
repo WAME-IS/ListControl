@@ -2,7 +2,7 @@
 
 namespace Wame\ListControl\Components;
 
-use ComponentModule\Renderer\TemplateTreeListRenderer;
+use Wame\ComponentModule\Renderer\TemplateTreeListRenderer;
 use Wame\ListControl\Renderer\IListRenderer;
 
 abstract class TreeListControl extends ListControl

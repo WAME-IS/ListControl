@@ -2,7 +2,7 @@
 
 namespace Wame\ListControl\Components;
 
-use ComponentModule\Renderer\TemplateListRenderer;
+use Wame\ComponentModule\Renderer\TemplateListRenderer;
 use Nette\ComponentModel\IComponent;
 use Wame\Core\Components\BaseControl;
 use Wame\ListControl\Renderer\IListRenderer;
